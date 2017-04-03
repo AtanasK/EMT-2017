@@ -46,4 +46,7 @@ public class Book extends BaseEntity {
   @ManyToMany(fetch = FetchType.EAGER)
   @IndexedEmbedded
   public List<Author> authors = new ArrayList<>();
+
+  @OneToOne
+  public BookDetails details;
 }

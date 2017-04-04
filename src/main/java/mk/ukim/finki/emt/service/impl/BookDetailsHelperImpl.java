@@ -2,6 +2,7 @@ package mk.ukim.finki.emt.service.impl;
 
 import mk.ukim.finki.emt.model.jpa.Book;
 import mk.ukim.finki.emt.model.jpa.BookDetails;
+import mk.ukim.finki.emt.model.jpa.BookPicture;
 import mk.ukim.finki.emt.model.jpa.FileEmbeddable;
 import mk.ukim.finki.emt.persistence.AuthorsRepository;
 import mk.ukim.finki.emt.persistence.BookPictureRepository;
@@ -11,7 +12,9 @@ import mk.ukim.finki.emt.service.BookDetailsServiceHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -46,42 +49,6 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
     }
 
     @Override
-    public int getDataSize(long bookId) {
-        Book book = bookRepository.findOne(bookId);
-
-        FileEmbeddable downloadFile = book.details.downloadFile;
-
-        return downloadFile.size;
-    }
-
-    @Override
-    public Blob getData(long bookId) {
-        Book book = bookRepository.findOne(bookId);
-
-        FileEmbeddable downloadFile = book.details.downloadFile;
-
-        return downloadFile.data;
-    }
-
-    @Override
-    public String getContentType(long bookId) {
-        Book book = bookRepository.findOne(bookId);
-
-        FileEmbeddable downloadFile = book.details.downloadFile;
-
-        return downloadFile.contentType;
-    }
-
-    @Override
-    public String getFileName(long bookId) {
-        Book book = bookRepository.findOne(bookId);
-
-        FileEmbeddable downloadFile = book.details.downloadFile;
-
-        return downloadFile.fileName;
-    }
-
-    @Override
     public void addDetailsToBook(long bookId, String description, Blob data, String fileName, String contentType, int size) {
         Book book = bookRepository.findOne(bookId);
 
@@ -107,29 +74,33 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
     }
 
     @Override
-    public void updateFileName(long bookId, String fileName) {
+    public FileEmbeddable getBookPicture(long bookId) {
         Book book = bookRepository.findOne(bookId);
 
-        FileEmbeddable downloadFile = book.details.downloadFile;
+        FileEmbeddable bookPicture = book.details.downloadFile;
 
-        downloadFile.fileName = fileName;
+        return bookPicture;
     }
 
     @Override
-    public void updateData(long bookId, Blob data) {
+    public BookDetails getBookDetails(long bookId) {
         Book book = bookRepository.findOne(bookId);
 
-        FileEmbeddable downloadFile = book.details.downloadFile;
-
-        downloadFile.data = data;
+        return book.details;
     }
 
     @Override
-    public void setContentType(long bookId, String contentType) {
-        Book book = bookRepository.findOne(bookId);
-
-        FileEmbeddable downloadFile = book.details.downloadFile;
-
-        downloadFile.contentType = contentType;
+    public BookPicture updateBookPicture(long bookId, byte[] bytes, String contentType) throws SQLException {
+        BookPicture bookPicture = new BookPicture();
+        bookPicture.book = bookRepository.findOne(bookId);
+        FileEmbeddable picture = new FileEmbeddable();
+        picture.contentType = contentType;
+        picture.data = new SerialBlob(bytes);
+        picture.size = bytes.length;
+        picture.fileName = bookPicture.book.name;
+        bookPicture.picture = picture;
+        return bookPictureRepository.save(bookPicture);
     }
+
+
 }

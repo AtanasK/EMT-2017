@@ -1,9 +1,6 @@
 package mk.ukim.finki.emt.service.impl;
 
-import mk.ukim.finki.emt.model.jpa.Book;
-import mk.ukim.finki.emt.model.jpa.BookPicture;
-import mk.ukim.finki.emt.model.jpa.Category;
-import mk.ukim.finki.emt.model.jpa.FileEmbeddable;
+import mk.ukim.finki.emt.model.jpa.*;
 import mk.ukim.finki.emt.persistence.*;
 import mk.ukim.finki.emt.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +23,8 @@ public class QueryServiceImpl implements QueryService {
 
   BookRepository bookRepository;
 
+  BookDetailsRepository bookDetailsRepository;
+
   @Autowired
   SearchRepository searchRepository;
 
@@ -34,12 +33,14 @@ public class QueryServiceImpl implements QueryService {
     QueryRepository bookRepository,
     CategoryRepository categoryRepository,
     BookPictureRepository bookPictureRepository,
-    BookRepository booksRepo
+    BookRepository booksRepo,
+    BookDetailsRepository bookDetailsRepository
   ) {
     this.queryRepository = bookRepository;
     this.categoryRepository = categoryRepository;
     this.bookPictureRepository = bookPictureRepository;
     this.bookRepository = booksRepo;
+    this.bookDetailsRepository = bookDetailsRepository;
   }
 
   @Override
@@ -65,8 +66,11 @@ public class QueryServiceImpl implements QueryService {
 
   @Override
   public FileEmbeddable getDownloadFile(Long bookId) {
-    Book book = bookRepository.findOne(bookId);
-    return book.details.downloadFile;
+//    Book book = bookRepository.findOne(bookId);
+//    return book.details.downloadFile;
+    BookDetails bookDetails = bookDetailsRepository.findByBookId(bookId);
+    FileEmbeddable downloadFile = bookDetails.downloadFile;
+    return downloadFile;
   }
 
   @Override

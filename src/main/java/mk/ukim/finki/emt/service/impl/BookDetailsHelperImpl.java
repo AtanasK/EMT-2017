@@ -4,10 +4,7 @@ import mk.ukim.finki.emt.model.jpa.Book;
 import mk.ukim.finki.emt.model.jpa.BookDetails;
 import mk.ukim.finki.emt.model.jpa.BookPicture;
 import mk.ukim.finki.emt.model.jpa.FileEmbeddable;
-import mk.ukim.finki.emt.persistence.AuthorsRepository;
-import mk.ukim.finki.emt.persistence.BookPictureRepository;
-import mk.ukim.finki.emt.persistence.BookRepository;
-import mk.ukim.finki.emt.persistence.CategoryRepository;
+import mk.ukim.finki.emt.persistence.*;
 import mk.ukim.finki.emt.service.BookDetailsServiceHelper;
 import mk.ukim.finki.emt.service.BookServiceHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,7 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
     private CategoryRepository categoryRepository;
     private BookRepository bookRepository;
     private AuthorsRepository authorsRepository;
+    private BookDetailsRepository bookDetailsRepository;
 
     @Autowired
     BookServiceHelper bookHelper;
@@ -36,11 +34,13 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
     public BookDetailsHelperImpl(
             CategoryRepository categoryRepository,
             BookRepository bookRepository,
-            AuthorsRepository authorsRepository
+            AuthorsRepository authorsRepository,
+            BookDetailsRepository bookDetailsRepository
     ) {
         this.categoryRepository = categoryRepository;
         this.bookRepository = bookRepository;
         this.authorsRepository = authorsRepository;
+        this.bookDetailsRepository = bookDetailsRepository;
     }
 
     @Override
@@ -68,6 +68,11 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
         downloadFile.size = size;
 
         bookDetails.downloadFile = downloadFile;
+        bookDetails.book = book;
+
+        book.details = bookDetails;
+
+        bookDetailsRepository.save(bookDetails);
     }
 
     @Override

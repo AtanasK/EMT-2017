@@ -7,6 +7,7 @@ import mk.ukim.finki.emt.model.jpa.BookPicture;
 import mk.ukim.finki.emt.model.jpa.Category;
 import mk.ukim.finki.emt.model.jpa.DeliveryPackage;
 
+import java.sql.Blob;
 import java.sql.SQLException;
 
 /**
@@ -59,6 +60,15 @@ public interface StoreManagementService {
   Book updateBookCategory(
     Long bookId,
     Long newCategoryId
+  );
+
+  void addBookDetails(
+    Long bookId,
+    String description,
+    Blob data,
+    String fileName,
+    String contentType,
+    int size
   );
 
 

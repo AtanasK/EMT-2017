@@ -5,12 +5,14 @@ import mk.ukim.finki.emt.model.jpa.Book;
 import mk.ukim.finki.emt.model.jpa.BookPicture;
 import mk.ukim.finki.emt.model.jpa.Category;
 import mk.ukim.finki.emt.model.jpa.DeliveryPackage;
+import mk.ukim.finki.emt.service.BookDetailsServiceHelper;
 import mk.ukim.finki.emt.service.BookServiceHelper;
 import mk.ukim.finki.emt.service.CategoryServiceHelper;
 import mk.ukim.finki.emt.service.StoreManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Blob;
 import java.sql.SQLException;
 
 /**
@@ -24,6 +26,9 @@ public class StoreManagementServiceImpl implements StoreManagementService {
 
   @Autowired
   private BookServiceHelper bookServiceHelper;
+
+  @Autowired
+  private BookDetailsServiceHelper bookDetailsServiceHelper;
 
   @Override
   public Category createTopLevelCategory(String name) {
@@ -69,6 +74,11 @@ public class StoreManagementServiceImpl implements StoreManagementService {
   @Override
   public Book updateBookCategory(Long bookId, Long newCategoryId) {
     return bookServiceHelper.updateBookCategory(bookId, newCategoryId);
+  }
+
+  @Override
+  public void addBookDetails(Long bookId, String description, Blob data, String fileName, String contentType, int size) {
+    bookDetailsServiceHelper.addDetailsToBook(bookId, description, data, fileName, contentType, size);
   }
 
   @Override

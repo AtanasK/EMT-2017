@@ -4,9 +4,7 @@ import mk.ukim.finki.emt.model.jpa.Book;
 import mk.ukim.finki.emt.model.jpa.Category;
 import mk.ukim.finki.emt.persistence.AuthorsRepository;
 import mk.ukim.finki.emt.service.StoreManagementService;
-import mk.ukim.finki.emt.service.UserRegistrationMailSender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -83,6 +82,15 @@ public class AdminController {
                 price
         );
         storeManagementService.addBookPicture(product.id, picture.getBytes(), picture.getContentType());
+
+        storeManagementService.addBookDetails(
+                product.id,
+                description,
+                new SerialBlob(downloadFile.getBytes()),
+                downloadFile.getName(),
+                downloadFile.getContentType(),
+                (int) downloadFile.getSize()
+        );
 
         model.addAttribute("product", product);
         return "index";

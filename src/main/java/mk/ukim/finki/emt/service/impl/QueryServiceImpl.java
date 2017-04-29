@@ -3,10 +3,8 @@ package mk.ukim.finki.emt.service.impl;
 import mk.ukim.finki.emt.model.jpa.Book;
 import mk.ukim.finki.emt.model.jpa.BookPicture;
 import mk.ukim.finki.emt.model.jpa.Category;
-import mk.ukim.finki.emt.persistence.BookPictureRepository;
-import mk.ukim.finki.emt.persistence.CategoryRepository;
-import mk.ukim.finki.emt.persistence.QueryRepository;
-import mk.ukim.finki.emt.persistence.SearchRepository;
+import mk.ukim.finki.emt.model.jpa.FileEmbeddable;
+import mk.ukim.finki.emt.persistence.*;
 import mk.ukim.finki.emt.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,6 +24,8 @@ public class QueryServiceImpl implements QueryService {
 
   BookPictureRepository bookPictureRepository;
 
+  BookRepository bookRepository;
+
   @Autowired
   SearchRepository searchRepository;
 
@@ -33,11 +33,13 @@ public class QueryServiceImpl implements QueryService {
   public QueryServiceImpl(
     QueryRepository bookRepository,
     CategoryRepository categoryRepository,
-    BookPictureRepository bookPictureRepository
+    BookPictureRepository bookPictureRepository,
+    BookRepository booksRepo
   ) {
     this.queryRepository = bookRepository;
     this.categoryRepository = categoryRepository;
     this.bookPictureRepository = bookPictureRepository;
+    this.bookRepository = booksRepo;
   }
 
   @Override
@@ -59,6 +61,12 @@ public class QueryServiceImpl implements QueryService {
   @Override
   public BookPicture getByBookId(Long bookId) {
     return bookPictureRepository.findByBookId(bookId);
+  }
+
+  @Override
+  public FileEmbeddable getDownloadFile(Long bookId) {
+    Book book = bookRepository.findOne(bookId);
+    return book.details.downloadFile;
   }
 
   @Override

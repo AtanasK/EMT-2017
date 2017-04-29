@@ -9,6 +9,7 @@ import mk.ukim.finki.emt.persistence.BookPictureRepository;
 import mk.ukim.finki.emt.persistence.BookRepository;
 import mk.ukim.finki.emt.persistence.CategoryRepository;
 import mk.ukim.finki.emt.service.BookDetailsServiceHelper;
+import mk.ukim.finki.emt.service.BookServiceHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,9 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
     private CategoryRepository categoryRepository;
     private BookRepository bookRepository;
     private AuthorsRepository authorsRepository;
+
+    @Autowired
+    BookServiceHelper bookHelper;
 
     public BookDetailsHelperImpl(
             CategoryRepository categoryRepository,
@@ -74,6 +78,20 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
     }
 
     @Override
+    public void addDownloadFile(long bookId, FileEmbeddable downloadFile) {
+        Book book = bookRepository.findOne(bookId);
+
+        book.details.downloadFile = downloadFile;
+    }
+
+    @Override
+    public FileEmbeddable getDownloadFile(long bookId) {
+        Book book = bookRepository.findOne(bookId);
+
+        return book.details.downloadFile;
+    }
+
+    @Override
     public FileEmbeddable getBookPicture(long bookId) {
         Book book = bookRepository.findOne(bookId);
 
@@ -91,15 +109,7 @@ public class BookDetailsHelperImpl implements BookDetailsServiceHelper {
 
     @Override
     public BookPicture updateBookPicture(long bookId, byte[] bytes, String contentType) throws SQLException {
-        BookPicture bookPicture = new BookPicture();
-        bookPicture.book = bookRepository.findOne(bookId);
-        FileEmbeddable picture = new FileEmbeddable();
-        picture.contentType = contentType;
-        picture.data = new SerialBlob(bytes);
-        picture.size = bytes.length;
-        picture.fileName = bookPicture.book.name;
-        bookPicture.picture = picture;
-        return bookPictureRepository.save(bookPicture);
+        return bookHelper.addBookPicture(bookId, bytes, contentType);
     }
 
 

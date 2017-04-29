@@ -25,4 +25,8 @@ public interface BookDetailsServiceHelper {
 
     void updateBookDescription(long bookId, String description);
 
+    void addDownloadFile(long bookId, FileEmbeddable downloadFile);
+
+    FileEmbeddable getDownloadFile(long bookId);
+
 }

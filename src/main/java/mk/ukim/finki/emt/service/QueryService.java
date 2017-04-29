@@ -3,6 +3,7 @@ package mk.ukim.finki.emt.service;
 import mk.ukim.finki.emt.model.jpa.Book;
 import mk.ukim.finki.emt.model.jpa.BookPicture;
 import mk.ukim.finki.emt.model.jpa.Category;
+import mk.ukim.finki.emt.model.jpa.FileEmbeddable;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface QueryService {
   List<Category> findTopLevelCategories();
 
   BookPicture getByBookId(Long bookId);
+
+  FileEmbeddable getDownloadFile(Long bookId);
 
   List<Book> searchBook(String query);
 }

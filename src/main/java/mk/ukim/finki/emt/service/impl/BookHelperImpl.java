@@ -53,8 +53,15 @@ public class BookHelperImpl implements BookServiceHelper {
   @Override
   public Book createBook(String name, Long categoryId, String[] authors, Long[] existingAuthors, String isbn, Double price) {
     Book book = createBookWithNewAuthors(name, categoryId, authors, isbn, price);
-    for (Long authorId : existingAuthors) {
-      book.authors.add(authorsRepository.findOne(authorId));
+    if (existingAuthors != null) {
+      for (Long authorId : existingAuthors) {
+          book.authors.add(authorsRepository.findOne(authorId));
+      }
+    }
+    for (String author : authors) {
+      Author newAuthor = new Author();
+      newAuthor.nameAndLastName = author;
+      book.authors.add(authorsRepository.save(newAuthor));
     }
     return bookRepository.save(book);
   }

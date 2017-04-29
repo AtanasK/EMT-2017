@@ -25,66 +25,67 @@ import java.sql.SQLException;
 @Controller
 public class AdminController {
 
-  StoreManagementService storeManagementService;
+    StoreManagementService storeManagementService;
 
-  @Autowired
-  AuthorsRepository authorsRepository;
+    @Autowired
+    AuthorsRepository authorsRepository;
 
-  @Autowired
-  public AdminController(StoreManagementService storeManagementService) {
-    this.storeManagementService = storeManagementService;
-  }
-
-  @RequestMapping(value = {"/admin/category"}, method = RequestMethod.GET)
-  public String addCategory(Model model) {
-    Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-    if(authentication.isAuthenticated()) {
-      UserDetails details= (UserDetails) authentication.getPrincipal();
+    @Autowired
+    public AdminController(StoreManagementService storeManagementService) {
+        this.storeManagementService = storeManagementService;
     }
-    model.addAttribute("pageFragment", "addCategory");
-    return "index";
-  }
 
-  @RequestMapping(value = {"/admin/book"}, method = RequestMethod.GET)
-  public String addProduct(Model model) {
-    model.addAttribute("pageFragment", "addBook");
-    model.addAttribute("authors", authorsRepository.findAll());
-    return "index";
-  }
+    @RequestMapping(value = {"/admin/category"}, method = RequestMethod.GET)
+    public String addCategory(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated()) {
+            UserDetails details = (UserDetails) authentication.getPrincipal();
+        }
+        model.addAttribute("pageFragment", "addCategory");
+        return "index";
+    }
+
+    @RequestMapping(value = {"/admin/book"}, method = RequestMethod.GET)
+    public String addProduct(Model model) {
+        model.addAttribute("pageFragment", "addBook");
+        model.addAttribute("authors", authorsRepository.findAll());
+        return "index";
+    }
 
 
-  @RequestMapping(value = {"/admin/category"}, method = RequestMethod.POST)
-  public String createCategory(Model model,
-                               @RequestParam String categoryName) {
-    Category category = storeManagementService.createTopLevelCategory(categoryName);
-    return "redirect:/admin/category";
-  }
+    @RequestMapping(value = {"/admin/category"}, method = RequestMethod.POST)
+    public String createCategory(Model model,
+                                 @RequestParam String categoryName) {
+        Category category = storeManagementService.createTopLevelCategory(categoryName);
+        return "redirect:/admin/category";
+    }
 
 
-  @RequestMapping(value = {"/admin/book"}, method = RequestMethod.POST)
-  public String createProduct(Model model,
-                              @RequestParam String name,
-                              @RequestParam Long categoryId,
-                              @RequestParam String authors,
-                              @RequestParam Long[] authorIds,
-                              @RequestParam String isbn,
-                              @RequestParam Double price,
-                              @RequestParam String description,
-                              MultipartFile picture) throws IOException, SQLException {
+    @RequestMapping(value = {"/admin/book"}, method = RequestMethod.POST)
+    public String createProduct(Model model,
+                                @RequestParam String name,
+                                @RequestParam Long categoryId,
+                                @RequestParam String authors,
+                                @RequestParam(required = false) Long[] authorIds,
+                                @RequestParam String isbn,
+                                @RequestParam Double price,
+                                @RequestParam String description,
+                                MultipartFile picture,
+                                MultipartFile downloadFile) throws IOException, SQLException {
 
-    Book product = storeManagementService.createBook(
-      name,
-      categoryId,
-      authors.split(";"),
-      authorIds,
-      isbn,
-      price
-    );
-    storeManagementService.addBookPicture(product.id, picture.getBytes(), picture.getContentType());
+        Book product = storeManagementService.createBook(
+                name,
+                categoryId,
+                authors.split(";"),
+                authorIds,
+                isbn,
+                price
+        );
+        storeManagementService.addBookPicture(product.id, picture.getBytes(), picture.getContentType());
 
-    model.addAttribute("product", product);
-    return "index";
-  }
+        model.addAttribute("product", product);
+        return "index";
+    }
 
 
 }

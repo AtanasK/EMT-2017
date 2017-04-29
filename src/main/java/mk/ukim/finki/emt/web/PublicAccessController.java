@@ -2,6 +2,7 @@ package mk.ukim.finki.emt.web;
 
 import mk.ukim.finki.emt.model.jpa.Book;
 import mk.ukim.finki.emt.model.jpa.BookPicture;
+import mk.ukim.finki.emt.model.jpa.FileEmbeddable;
 import mk.ukim.finki.emt.service.QueryService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +92,26 @@ public class PublicAccessController {
     response.setContentLength(bookPicture.picture.size);
 
     IOUtils.copy(bookPicture.picture.data.getBinaryStream(), out);
+
+    out.flush();
+    out.close();
+  }
+
+  @RequestMapping(value = {"/book/{id}/file"}, method = RequestMethod.GET)
+  @ResponseBody
+  public void downloadFile(@PathVariable Long id, HttpServletResponse response) throws IOException, SQLException {
+    OutputStream out = response.getOutputStream();
+
+    FileEmbeddable downloadFile = queryService.getDownloadFile(id);
+
+    String contentDisposition = String.format("inline;filename=\"%s\"",
+            downloadFile.fileName + ".pdf?productId=" + id);
+
+    response.setHeader("Content-Disposition", contentDisposition);
+    response.setContentType(downloadFile.contentType);
+    response.setContentLength(downloadFile.size);
+
+    IOUtils.copy(downloadFile.data.getBinaryStream(), out);
 
     out.flush();
     out.close();

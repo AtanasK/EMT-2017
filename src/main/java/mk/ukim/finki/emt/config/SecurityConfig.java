@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.encoding.LdapShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,9 +31,11 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.filter.CompositeFilter;
+import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 
 import javax.servlet.Filter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -224,6 +227,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     );
     oauthFilter.setAuthenticationSuccessHandler(successHandler);
     return oauthFilter;
+  }
+
+  @Override
+  public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth
+            .ldapAuthentication()
+            .userDnPatterns("uid={0},ou=people")
+            .groupSearchBase("ou=groups")
+            .contextSource(contextSource())
+            .passwordCompare()
+            .passwordEncoder(new LdapShaPasswordEncoder())
+            .passwordAttribute("userPassword");
+  }
+
+  @Bean
+  public DefaultSpringSecurityContextSource contextSource() {
+    return  new DefaultSpringSecurityContextSource(Arrays.asList("ldap://localhost:8389/"), "dc=springframework,dc=org");
   }
 
 }
